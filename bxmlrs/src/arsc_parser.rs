@@ -239,32 +239,33 @@ impl<'barsc> Arsc<'barsc> {
         let typ = (res_id >> 16) & 0xFF;
         let entry = res_id & 0xFFFF;
 
-        let typ = self
-            .packages
-            .get(&package_id)
-            .unwrap()
-            .types
-            .iter()
-            .filter(|t| t.0 == typ)
-            .collect::<Vec<_>>();
-        let entry = typ
-            .iter()
-            .filter(|(_, v)| v.get(entry as usize).is_some())
-            .filter_map(|(_, v)| v.get(entry as usize))
-            .collect::<Vec<_>>();
+        if let Some(package) = self.packages.get(&package_id) {
+            let typ = package
+                .types
+                .iter()
+                .filter(|t| t.0 == typ)
+                .collect::<Vec<_>>();
+            let entry = typ
+                .iter()
+                .filter(|(_, v)| v.get(entry as usize).is_some())
+                .filter_map(|(_, v)| v.get(entry as usize))
+                .collect::<Vec<_>>();
 
-        // Currently we return the first valid entry despite config settings
-        let first_element = entry
-            .iter()
-            .filter_map(|inner_vec| inner_vec.iter().filter_map(|opt| opt.as_ref()).next())
-            .next()
-            .cloned();
+            // Currently we return the first valid entry despite config settings
+            let first_element = entry
+                .iter()
+                .filter_map(|inner_vec| inner_vec.iter().find_map(|opt| opt.as_ref()))
+                .next()
+                .cloned();
 
-        // if first_element == None {
-        //     println!("entry: {:?}", entry);
-        // }
+            // if first_element == None {
+            //     println!("entry: {:?}", entry);
+            // }
 
-        first_element
+            first_element
+        } else {
+            None
+        }
     }
 }
 
