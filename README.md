@@ -17,3 +17,5 @@ xml_reader.trim_text(true);
 println!("manifest:\n{}", std::str::from_utf8(&manifest_bytes)?);
 
 ```
+
+Check `bxmlrs-bin` for an example.
