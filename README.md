@@ -1,5 +1,7 @@
 # BXMLRS
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b382baa771064581871260a767b52e81)](https://app.codacy.com/gh/ariqa-labs/bxmlrs?utm_source=github.com&utm_medium=referral&utm_content=ariqa-labs/bxmlrs&utm_campaign=Badge_Grade)
+
 `bxmlrs` is a Rust library (WIP) for parsing binary Android XML files (`AndroidManifest.xml`).
 
 ## Usage
