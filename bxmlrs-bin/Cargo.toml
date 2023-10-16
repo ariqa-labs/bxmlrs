@@ -1,0 +1,12 @@
+[package]
+name = "bxmlrs-bin"
+version = "0.1.0"
+edition = "2021"
+
+
+[dependencies]
+bxmlrs = { path = "../bxmlrs" }
+anyhow = { version = "*" }
+clap = { version = "4.4", features = ["derive"] }
+path-clean ={ version = "1" }
+quick-xml = { version = "0.30" }

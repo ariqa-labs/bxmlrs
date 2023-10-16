@@ -1,0 +1,21 @@
+[package]
+name = "bxmlrs"
+version = "0.1.0"
+edition = "2021"
+description = "Android Binary XML parser"
+
+[dependencies]
+nom = { version = "7.1" }
+thiserror = { version = "1" }
+quick-xml = { version = "0.30" }
+zip = { version = "0.6" }
+
+[dev-dependencies]
+anyhow = { version = "1" }
+quick-xml = { version = "0.30" }
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+opt-level = "z"

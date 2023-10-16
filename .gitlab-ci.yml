@@ -1,0 +1,47 @@
+image: "rust:latest"
+
+default:
+  before_script:
+    - rustc --version
+    - cargo --version
+    - rustup component add rustfmt
+    - cargo install cargo-audit
+    - rustup target add x86_64-unknown-linux-musl
+    - apt-get update -y
+    - apt-get install musl-tools -y
+    - curl -LsSf https://get.nexte.st/latest/linux | tar zxf - -C ${CARGO_HOME:-~/.cargo}/bin
+
+stages:
+  - build
+  - test
+  - fmt
+  - security
+
+rust-latest:
+  stage: build
+  image: rust:latest
+  script:
+    - cargo build --target x86_64-unknown-linux-musl --release --verbose
+
+rust-nightly:
+  stage: build
+  image: rustlang/rust:nightly
+  script:
+    - cargo build --target x86_64-unknown-linux-musl --verbose
+  allow_failure: true
+
+fmt-code:
+  stage: fmt
+  script:
+    - cargo fmt --all -- --check
+
+test-code:
+  stage: test
+  script:
+    - cargo nextest run --verbose
+    - cargo nextest run --verbose --release
+
+audit-code:
+  stage: security
+  script:
+    - cargo audit
