@@ -33,7 +33,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn print_manifest(file_path: &Path) -> Result<()> {
-    let mut parser = parser::Parser::from_file(file_path.to_str().unwrap())?;
+    let mut parser = parser::Parser::from_file(file_path)?;
     let manifest_bytes = parser.parse()?;
 
     let mut xml_reader = quick_xml::reader::Reader::from_str(std::str::from_utf8(&manifest_bytes)?);

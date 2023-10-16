@@ -3,6 +3,7 @@ use crate::nom_parser::ParseError;
 use crate::xml_parser::AndroidManifest;
 use std::fs::File;
 use std::io::Read;
+use std::path::Path;
 use zip::ZipArchive;
 
 pub struct Parser {
@@ -11,7 +12,7 @@ pub struct Parser {
 }
 
 impl Parser {
-    pub fn from_file(file_path: &str) -> Result<Self, ParseError> {
+    pub fn from_file(file_path: &Path) -> Result<Self, ParseError> {
         let file = File::open(file_path).map_err(|e| ParseError::File(e.to_string()))?;
         let mut archive = ZipArchive::new(file).map_err(|e| ParseError::Zip(e.to_string()))?;
         let mut manifest_raw: Vec<u8> = Vec::new();
@@ -61,7 +62,7 @@ mod tests {
     #[test]
     fn test_parser() -> Result<()> {
         let parsed_manifest_bytes =
-            Parser::from_file("../data/apk/com.etb.filemanager_3.apk")?.parse()?;
+            Parser::from_file("../data/apk/com.etb.filemanager_3.apk".as_ref())?.parse()?;
         let mut reader = Reader::from_str(std::str::from_utf8(&parsed_manifest_bytes)?);
         reader.trim_text(true);
 
