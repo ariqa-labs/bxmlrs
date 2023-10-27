@@ -16,6 +16,9 @@ pub enum ParseError {
     #[error("Failed to parse string pool header: {0}")]
     StringPoolHeader(String),
 
+    #[error("Buffer not enough: {0}")]
+    BufferNotEnough(String),
+
     #[error("Failed to parse string pool: {0}")]
     StringPool(String),
 
@@ -161,6 +164,9 @@ impl StringPoolChunk {
             let (mut string_buffer, str_len) = le_u8::<_, nom::error::Error<&[u8]>>(string_buffer)
                 .map_err(|e| ParseError::String(e.to_string()))?;
             string_buffer = &string_buffer[1..];
+            if string_buffer.len() < str_len as usize {
+                return Err(ParseError::BufferNotEnough("Not enough bytes".to_string()));
+            }
             let (_, str_bytes) =
                 count(le_u8::<_, nom::error::Error<&[u8]>>, str_len as usize)(string_buffer)
                     .map_err(|e| ParseError::String(e.to_string()))?;
@@ -173,6 +179,9 @@ impl StringPoolChunk {
         } else {
             let (string_buffer, str_len) = le_u16::<_, nom::error::Error<&[u8]>>(string_buffer)
                 .map_err(|e| ParseError::String(e.to_string()))?;
+            if string_buffer.len() < str_len as usize * 2 {
+                return Err(ParseError::BufferNotEnough("Not enough bytes".to_string()));
+            }
             let (_, str_bytes) =
                 count(le_u16::<_, nom::error::Error<&[u8]>>, str_len as usize)(string_buffer)
                     .map_err(|e| ParseError::String(e.to_string()))?;
@@ -555,13 +564,26 @@ pub mod parser {
     ) -> Result<Vec<String>, ParseError> {
         // NOTE: We need to count even empty strings because they are indexed by id
         // println!("index: {} - string: {}", self.strings.len(), curr_string);
-        string_offsets
-            .iter()
-            .map(|&offset| {
-                let string_buffer: &[u8] = &strings_buffer[offset as usize..];
-                string_pool_chunk.extract_string(string_buffer)
-            })
-            .collect()
+        let mut strings = vec![];
+
+        for offset in string_offsets {
+            if offset >= strings_buffer.len() as u32 {
+                break;
+            }
+            let string_buffer: &[u8] = &strings_buffer[offset as usize..];
+            match string_pool_chunk.extract_string(string_buffer) {
+                Ok(string) => strings.push(string),
+                Err(err) => match err {
+                    // Sometimes the buffer is not enough even though there are more string offsets
+                    // Usually that's due to obfuscation techniques
+                    ParseError::BufferNotEnough(_) => {
+                        break;
+                    }
+                    _ => return Err(err),
+                },
+            }
+        }
+        Ok(strings)
     }
 
     pub(crate) fn parse_string_pool_header(input: &[u8]) -> IResult<&[u8], StringPoolChunk> {

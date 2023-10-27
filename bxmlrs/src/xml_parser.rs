@@ -53,7 +53,10 @@ impl<'bxml> AndroidManifest<'bxml> {
 
         if xml_chunk_header.typ != ChunkType::XML {
             // Android doesn't seem to care about the xml type identifier
-            println!("Invalid xml chunk type: 0x{:x}", xml_chunk_header.typ);
+            println!(
+                "[warning] Invalid xml chunk type: 0x{:x}",
+                xml_chunk_header.typ
+            );
         }
         // println!("xml chunk header: {}", xml_chunk_header);
 
@@ -122,6 +125,8 @@ impl<'bxml> AndroidManifest<'bxml> {
                     for _ in 0..xml_attr_ext.attribute_count {
                         let (_, attr) = XMLTreeAttribute::parse(input)
                             .map_err(|e| ParseError::Attribute(e.to_string()))?;
+                        // TODO: what if attribute size is spoofed and set to a random number?
+                        // println!("attribute size: {:?}", xml_attr_ext.attribute_size);
                         input = &input[xml_attr_ext.attribute_size as usize..];
 
                         let _attr_ns = self
