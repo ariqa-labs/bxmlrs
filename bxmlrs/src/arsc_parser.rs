@@ -215,7 +215,10 @@ impl<'barsc> Arsc<'barsc> {
     Ok(self.binary_arsc.to_vec())
   }
 
-  pub fn get_res_value(&self, res_id: u32) -> Option<String> {
+  pub fn get_res_value(
+    &self,
+    res_id: u32,
+  ) -> Option<String> {
     let package_id = res_id >> 24;
     let typ = (res_id >> 16) & 0xFF;
     let entry = res_id & 0xFFFF;

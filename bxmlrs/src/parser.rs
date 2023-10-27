@@ -71,7 +71,9 @@ mod tests {
     loop {
       match reader.read_event() {
         Ok(quick_xml::events::Event::Eof) => break,
-        Err(e) => panic!("Error at position {}: {:?}", reader.buffer_position(), e),
+        Err(e) => {
+          panic!("Error at position {}: {:?}", reader.buffer_position(), e)
+        }
         _ => (),
       }
     }

@@ -104,7 +104,10 @@ impl ChunkHeader {
 }
 
 impl std::fmt::Display for ChunkHeader {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+  fn fmt(
+    &self,
+    f: &mut std::fmt::Formatter<'_>,
+  ) -> std::fmt::Result {
     write!(
       f,
       "ChunkHeader {{ typ: 0x{:x}, header_size: 0x{:x}, chunk_size: 0x{:x} }}",
@@ -159,7 +162,10 @@ pub struct StringPoolChunk {
 }
 
 impl StringPoolChunk {
-  fn extract_string(&self, string_buffer: &[u8]) -> Result<String, ParseError> {
+  fn extract_string(
+    &self,
+    string_buffer: &[u8],
+  ) -> Result<String, ParseError> {
     if self.is_utf8 {
       let (mut string_buffer, str_len) = le_u8::<_, nom::error::Error<&[u8]>>(string_buffer)
         .map_err(|e| ParseError::String(e.to_string()))?;
@@ -465,7 +471,10 @@ impl ResValue {
     )(input)
   }
 
-  pub(crate) fn as_string(&self, strings: &[String]) -> Option<String> {
+  pub(crate) fn as_string(
+    &self,
+    strings: &[String],
+  ) -> Option<String> {
     match self.data_type {
       ResType::STRING => strings.get(self.data as usize).cloned(),
       ResType::INT_BOOLEAN => Some((if self.data != 0 { "true" } else { "false" }).to_string()),
@@ -511,7 +520,10 @@ impl ResType {
 pub mod parser {
   use super::*;
 
-  pub(crate) fn take_u32s(buffer: &[u8], len: usize) -> IResult<&[u8], Vec<u32>> {
+  pub(crate) fn take_u32s(
+    buffer: &[u8],
+    len: usize,
+  ) -> IResult<&[u8], Vec<u32>> {
     count(le_u32::<_, nom::error::Error<&[u8]>>, len)(buffer)
   }
 

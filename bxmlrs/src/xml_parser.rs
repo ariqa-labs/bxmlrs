@@ -33,7 +33,10 @@ impl<'bxml> AndroidManifest<'bxml> {
     }
   }
 
-  pub fn parse(&mut self, arsc: Option<&Arsc>) -> Result<Vec<u8>, ParseError> {
+  pub fn parse(
+    &mut self,
+    arsc: Option<&Arsc>,
+  ) -> Result<Vec<u8>, ParseError> {
     let mut xml_writer = Writer::new(Cursor::new(Vec::new()));
     // <?xml version="1.0" encoding="utf-8"?>
     let decl = BytesDecl::from_start(BytesStart::from_content(
@@ -226,14 +229,20 @@ impl<'bxml> AndroidManifest<'bxml> {
     Ok(xml_result)
   }
 
-  fn parse_namespace<'a>(&self, input: &'a [u8]) -> IResult<&'a [u8], XmlNamespace> {
+  fn parse_namespace<'a>(
+    &self,
+    input: &'a [u8],
+  ) -> IResult<&'a [u8], XmlNamespace> {
     map(tuple((le_u32, le_u32)), |(prefix, uri)| XmlNamespace {
       prefix: self.strings[prefix as usize].clone(),
       uri: self.strings[uri as usize].clone(),
     })(input)
   }
 
-  fn parse_tree_attr_ext<'a>(&self, input: &'a [u8]) -> IResult<&'a [u8], XMLTreeAttrExt> {
+  fn parse_tree_attr_ext<'a>(
+    &self,
+    input: &'a [u8],
+  ) -> IResult<&'a [u8], XMLTreeAttrExt> {
     map(
       tuple((
         le_u32, le_u32, le_u16, le_u16, le_u16, le_u16, le_u16, le_u16,
@@ -260,7 +269,10 @@ impl<'bxml> AndroidManifest<'bxml> {
     )(input)
   }
 
-  fn parse_tree_attr_ext_end<'a>(&self, input: &'a [u8]) -> IResult<&'a [u8], XMLTreeAttrExt> {
+  fn parse_tree_attr_ext_end<'a>(
+    &self,
+    input: &'a [u8],
+  ) -> IResult<&'a [u8], XMLTreeAttrExt> {
     map(tuple((le_u32, le_u32)), |(ns, name)| XMLTreeAttrExt {
       ns,
       name,
