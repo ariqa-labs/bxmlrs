@@ -7,12 +7,11 @@ description = "Android Binary XML parser"
 [dependencies]
 nom = { version = "7.1" }
 thiserror = { version = "1" }
-quick-xml = { version = "0.30" }
+quick-xml = { version = "0.31" }
 zip = { version = "0.6" }
 
 [dev-dependencies]
 anyhow = { version = "1" }
-quick-xml = { version = "0.30" }
 
 [profile.release]
 lto = true
