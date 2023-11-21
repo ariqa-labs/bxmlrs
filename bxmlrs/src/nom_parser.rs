@@ -181,7 +181,7 @@ impl StringPoolChunk {
         .position(|&x| x == 0)
         .unwrap_or(str_bytes.len());
       let str_bytes = &str_bytes[..null_pos];
-      Ok(std::string::String::from_utf8_lossy(str_bytes).to_string())
+      Ok(String::from_utf8_lossy(str_bytes).to_string())
     } else {
       let (string_buffer, str_len) = le_u16::<_, nom::error::Error<&[u8]>>(string_buffer)
         .map_err(|e| ParseError::String(e.to_string()))?;
@@ -196,7 +196,7 @@ impl StringPoolChunk {
         .position(|&x| x == 0)
         .unwrap_or(str_bytes.len());
       let str_bytes = &str_bytes[..null_pos];
-      Ok(std::string::String::from_utf16_lossy(str_bytes))
+      Ok(String::from_utf16_lossy(str_bytes))
     }
   }
 }

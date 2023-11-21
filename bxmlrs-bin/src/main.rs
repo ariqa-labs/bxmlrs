@@ -223,7 +223,7 @@ mod tests {
 
   #[test]
   fn test_apks() -> Result<()> {
-    let dir_path = std::path::Path::new("../data/apk");
+    let dir_path = Path::new("../data/apk");
     let files = dir_path.read_dir()?;
     for file in files {
       let file = file?.path().canonicalize()?;
