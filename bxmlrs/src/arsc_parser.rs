@@ -50,6 +50,7 @@ impl<'barsc> Arsc<'barsc> {
   pub fn parse(&mut self) -> Result<Vec<u8>, ParseError> {
     let (_, arsc_table_header) =
       parser::parse_table(self.binary_arsc).map_err(|e| ParseError::ChunkHeader(e.to_string()))?;
+    // println!("arsc table header: {:?}", arsc_table_header);
 
     // Android doesn't care about the chunk type
     // chunk_header.typ != ChunkType::Table
@@ -103,6 +104,7 @@ impl<'barsc> Arsc<'barsc> {
           loop {
             let (_, chunk_header) = ChunkHeader::parse(type_buffer)
               .map_err(|e| ParseError::ChunkHeader(e.to_string()))?;
+            // println!("chunk header: {}", chunk_header);
             match chunk_header.typ {
               ChunkType::TABLE_SPEC => {
                 let (_, type_spec_header) = TypeSpecChunkHeader::parse(type_buffer)
@@ -119,6 +121,7 @@ impl<'barsc> Arsc<'barsc> {
                  */
                 let (type_buffer_next, type_chunk_header) = TypeChunkHeader::parse(type_buffer)
                   .map_err(|e| ParseError::TypeChunkHeader(e.to_string()))?;
+                // println!("type chunk header: {:?}", type_chunk_header);
                 // The type identifier this chunk refers to.  Type IDs start at 1.
                 if type_chunk_header.id == 0 {
                   // 0 is invalid
@@ -136,7 +139,7 @@ impl<'barsc> Arsc<'barsc> {
                 let mut res_entries = Vec::new();
                 for entry in entries {
                   let mut current_entries = Vec::new();
-                  if entry == 0xFFFFFFFF {
+                  if entry == 0xFFFFFFFF || entry > map_buffer.len() as u32 {
                     // no value for the resource, push empty entry
                     res_entries.push(current_entries);
                     continue;
@@ -145,6 +148,10 @@ impl<'barsc> Arsc<'barsc> {
                   let buffer = &map_buffer[entry as usize..];
                   let (buffer_next, table_entry) = crate::nom_parser::TableEntry::parse(buffer)
                     .map_err(|e| ParseError::TableEntry(e.to_string()))?;
+                  if table_entry.size == 0 {
+                    res_entries.push(current_entries);
+                    continue;
+                  }
 
                   // TODO: other flags
                   if table_entry.flags == TableEntryFlag::COMPLEX {
